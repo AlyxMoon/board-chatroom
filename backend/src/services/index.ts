@@ -1,9 +1,9 @@
-import { users } from './users/users'
 import { Application } from '../declarations'
-import { MessageService } from './messages.service'
+import { messages } from './messages/messages'
+import { users } from './users/users'
 
 export const services = (app: Application): Application => {
-  app.use('messages', new MessageService())
+  app.configure(messages)
   app.configure(users)
   return app
 }
