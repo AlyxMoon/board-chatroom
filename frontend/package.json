@@ -9,6 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@feathersjs/authentication-client": "^5.0.10",
+    "@feathersjs/feathers": "^5.0.10",
+    "@feathersjs/socketio-client": "^5.0.10",
+    "socket.io-client": "^4.7.2",
     "vue": "^3.3.4"
   },
   "devDependencies": {
