@@ -1,20 +1,30 @@
 import { feathers } from '@feathersjs/feathers'
-import { koa, rest, bodyParser, errorHandler } from '@feathersjs/koa'
+import configuration from '@feathersjs/configuration'
+import { koa, rest, bodyParser, errorHandler, parseAuthentication } from '@feathersjs/koa'
 import socketio from '@feathersjs/socketio'
+import { configurationValidator } from './configuration'
+import type { Application } from './declarations'
 import { initializeDB } from './db'
-import { ConfigureServices, ServiceTypes } from './services'
+import { services } from './services'
+import { authentication } from './authentication'
 
 const main = async () => {
   await initializeDB()
-  const app = koa<ServiceTypes>(feathers())
   
+  const app: Application = koa(feathers())
+  app.configure(configuration(configurationValidator))
+
   app.use(errorHandler())
+  app.use(parseAuthentication())
   app.use(bodyParser())
   app.configure(rest())
   app.configure(socketio())
-  app.configure(ConfigureServices)
+  app.configure(authentication)
+  app.configure(services)
   
-  app.listen(3030).then(() => console.log('Feathers server listening on port 3030.'))
+  const host = app.get('host')
+  const port = app.get('port')
+  app.listen(port).then(() => console.log(`Feathers server listening on port ${host}:${port}`))
 }
 
 main()

@@ -24,3 +24,9 @@ export class MessageService {
     return message
   }
 }
+
+declare module '../declarations' {
+  interface ServiceTypes {
+    messages: MessageService
+  }
+}

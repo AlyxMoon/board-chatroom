@@ -1,16 +1,9 @@
-import { Application } from '@feathersjs/feathers'
+import { users } from './users/users'
+import { Application } from '../declarations'
 import { MessageService } from './messages.service'
-import { UserService } from './users.service'
 
-export type ServiceTypes = {
-  messages: MessageService,
-  users: UserService,
-}
-
-export const ConfigureServices = (app: Application): Application => {
-  console.log('configuring services')
+export const services = (app: Application): Application => {
   app.use('messages', new MessageService())
-  app.use('users', new UserService())
-
+  app.configure(users)
   return app
 }
