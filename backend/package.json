@@ -21,6 +21,9 @@
     ],
     "schema": "typebox"
   },
+  "engines": {
+    "node": "18.18.1"
+  },
   "devDependencies": {
     "@feathersjs/cli": "^5.0.10",
     "@types/node": "^20.8.3",
