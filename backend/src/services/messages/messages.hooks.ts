@@ -14,7 +14,7 @@ export default {
   around: {
     all: [
       authenticate('jwt'),
-      schemaHooks.resolveResult(messagesResolver),
+      schemaHooks.resolveResult<any>(messagesResolver),
     ],
     find: [],
     get: [],
@@ -26,13 +26,13 @@ export default {
   before: {
     all: [
       schemaHooks.validateQuery(messagesQueryValidator),
-      schemaHooks.resolveQuery(messagesQueryResolver),
+      schemaHooks.resolveQuery<any>(messagesQueryResolver),
     ],
     find: [],
     get: [],
     create: [
       schemaHooks.validateData(messagesDataValidator),
-      schemaHooks.resolveData(messagesDataResolver),
+      schemaHooks.resolveData<any>(messagesDataResolver),
     ],
     patch: [],
     remove: []

@@ -19,13 +19,13 @@ export type Users = Static<typeof usersSchema>
 export const usersValidator = getValidator(usersSchema, dataValidator)
 export const usersResolver = resolve<Users, HookContext>({})
 
-export const usersExternalResolver = resolve<Users, HookContext>({
+export const usersExternalResolver = resolve<Users, HookContext<'users'>>({
   password: async () => undefined
 })
 
 // Schema for creating new entries
 export const usersDataSchema = Type.Pick(usersSchema, 
-  ['username', 'password', 'color'],
+  ['username', 'password', 'color'] as const,
   { $id: 'UsersData' },
 )
 export type UsersData = Static<typeof usersDataSchema>
@@ -45,7 +45,9 @@ export const usersPatchResolver = resolve<Users, HookContext>({
 })
 
 // Schema for allowed query properties
-export const usersQueryProperties = Type.Pick(usersSchema, ['id', 'username', 'color'])
+export const usersQueryProperties = Type.Pick(usersSchema,
+  ['id', 'username', 'color'] as const,
+)
 export const usersQuerySchema = Type.Intersect(
   [
     querySyntax(usersQueryProperties),
@@ -56,6 +58,8 @@ export const usersQuerySchema = Type.Intersect(
 )
 export type UsersQuery = Static<typeof usersQuerySchema>
 export const usersQueryValidator = getValidator(usersQuerySchema, queryValidator)
-export const usersQueryResolver = resolve<UsersQuery, HookContext>({
-  id: async (value, user, context) => context.params.user?.id ?? value,
+export const usersQueryResolver = resolve<UsersQuery, HookContext<'users'>>({
+  id: async (value, user, context: HookContext<'users'>): Promise<string> => {
+    return context.params.user?.id ?? value
+  },
 })

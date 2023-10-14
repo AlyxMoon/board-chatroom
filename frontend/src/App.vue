@@ -1,38 +1,36 @@
 <script setup lang="ts">
 
 import { onMounted, ref } from 'vue';
-import { feathers } from '@feathersjs/feathers'
-import authentication from '@feathersjs/authentication-client'
-import socketio from '@feathersjs/socketio-client'
-import io from 'socket.io-client'
 
-const socket = io('http://localhost:3030')
-const app = feathers()
+import app from './api.ts'
+import RegistrationForm from './components/registrationForm.component.vue'
 
-app.configure(socketio(socket))
-app.configure(authentication())
-
+const loaded = ref(false)
+const authenticated = ref(false)
 const messageText = ref('')
 const messages = ref<any[]>([])
 
 onMounted(async () => {
-  const response = await app.authenticate({
-    strategy: 'local',
-    username: 'Allister 1',
-    password: 'Password1',
-  })
-  console.log(response)
+  authenticated.value = app.authentication.authenticated
+  const existingToken = await app.authentication.getAccessToken()
+  if (existingToken) { await app.reAuthenticate() }
 
-  socket.emit('find', 'messages', {}, (err: any, data: any[]) => {
-    if (err) { return; }
-    messages.value = data
-  })
+  // socket.emit('find', 'messages', {}, (err: any, data: any[]) => {
+  //   if (err) { return; }
+  //   messages.value = data
+  // })
+
+  loaded.value = true
 })
 
 const sendMessage = async () => {
-  app.service('messages').create({
+  await app.service('messages').create({
     text: messageText.value,
   })
+}
+
+const logout = async () => {
+  await app.authentication.logout()
 }
 
 app.service('messages').on('created', data => {
@@ -40,20 +38,53 @@ app.service('messages').on('created', data => {
   messages.value.unshift(data)
 })
 
+app.on('login', (data) => {
+  console.log('we have logged in', data)
+  authenticated.value = true
+})
+
+app.on('logout', () => {
+  authenticated.value = false
+})
+
 </script>
 
 <template>
-  <h1>Application</h1>
+  <template v-if="loaded">
+    <header>
+      <div></div>
+      <h1>Application</h1>
 
-  <input type="text" v-model="messageText">
-  <button @click="sendMessage()">Send Message</button>
+      <button v-if="authenticated" @click="logout()">LogOut</button>
+    </header>
 
-  <ul>
-    <li v-for="message in messages" :key="message.id">
-      {{ message.createdAt }}: {{ message.text }}
-    </li>
-  </ul>
+    <RegistrationForm v-if="!authenticated"></RegistrationForm>
+
+    <div v-else>
+      <input type="text" v-model="messageText">
+      <button @click="sendMessage()">Send Message</button>
+
+      <ul>
+        <li v-for="message in messages" :key="message.id">
+          {{ message.createdAt }}: {{ message.text }}
+        </li>
+      </ul>
+    </div>
+  </template>
 </template>
 
 <style lang="scss" scoped>
+header {
+  padding: 1rem 3rem;
+  display: grid;
+  grid-template-columns: 80px 1fr 80px;
+  align-items: center;
+
+  text-align: center;
+
+  button {
+    padding: 0.2rem 1rem;
+    line-height: 1;
+  }
+}
 </style>

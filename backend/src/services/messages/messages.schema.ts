@@ -19,7 +19,7 @@ export const messagesValidator = getValidator(messagesSchema, dataValidator)
 export const messagesResolver = resolve<Messages, HookContext>({})
 
 export const messagesDataSchema = Type.Pick(messagesSchema, 
-  ['text'],
+  ['text'] as const,
   { $id: 'MessagesData' },
 )
 export type MessagesData = Static<typeof messagesDataSchema>
@@ -31,7 +31,7 @@ export const messagesDataResolver = resolve<Messages, HookContext>({
 
 export const messagesQueryProperties = Type.Pick(
   messagesSchema, 
-  ['id', 'userId', 'text', 'createdAt']
+  ['id', 'userId', 'text', 'createdAt'] as const,
 )
 export const messagesQuerySchema = Type.Intersect(
   [

@@ -7,7 +7,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "skeleton-css/css/normalize"; @import "skeleton-css/css/skeleton";`,
+        additionalData: ``,
       },
     },
   },
