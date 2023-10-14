@@ -1,11 +1,15 @@
-import rethink from 'rethinkdb'
+import { table as dbTable, desc as dbDesc } from 'rethinkdb'
 import { getConnection } from '../../db'
 import { Messages } from './messages.schema'
 
 export class MessageService {
   async find() {
-    const cursor = await rethink.table('messages')
-      .orderBy(rethink.desc('createdAt'))
+    const cursor = await dbTable('messages')
+      .eqJoin('userId', dbTable('users'))
+      // @ts-ignore
+      .without({ right: { id: true, password: true } })
+      .zip()
+      .orderBy(dbDesc('createdAt'))
       .limit(50)
       .run(await getConnection())
     return await cursor.toArray() 
@@ -18,7 +22,7 @@ export class MessageService {
       createdAt: data.createdAt,
     }
 
-    await rethink.table('messages').insert(message).run(await getConnection())
+    await dbTable('messages').insert(message).run(await getConnection())
     return message
   }
 }

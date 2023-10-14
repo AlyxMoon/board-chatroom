@@ -9,5 +9,4 @@ const app = feathers()
 app.configure(socketio(socket))
 app.configure(authentication())
 
-
 export default app

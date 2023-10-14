@@ -15,10 +15,8 @@ onMounted(async () => {
   const existingToken = await app.authentication.getAccessToken()
   if (existingToken) { await app.reAuthenticate() }
 
-  // socket.emit('find', 'messages', {}, (err: any, data: any[]) => {
-  //   if (err) { return; }
-  //   messages.value = data
-  // })
+  messages.value = await app.service('messages').find()
+  console.log(messages.value)
 
   loaded.value = true
 })
@@ -66,7 +64,7 @@ app.on('logout', () => {
 
       <ul>
         <li v-for="message in messages" :key="message.id">
-          {{ message.createdAt }}: {{ message.text }}
+          {{ message.username }}: {{ message.text }}
         </li>
       </ul>
     </div>

@@ -1,4 +1,5 @@
-import rethink, { Connection } from 'rethinkdb'
+import { connect, db } from 'rethinkdb'
+import type { Connection } from 'rethinkdb'
 
 let connection: Connection
 
@@ -9,15 +10,15 @@ export const initializeDB = async () => {
     port: 28015,
   }
 
-  connection = await rethink.connect(config)
+  connection = await connect(config)
   console.log('RethinkDB connected')
 
   const desiredTables = ['messages', 'users']
-  const existingTables = await rethink.db('board-chatroom').tableList().run(connection)
+  const existingTables = await db('board-chatroom').tableList().run(connection)
 
   for (const table of desiredTables) {
     if (!existingTables.includes(table)) {
-      await rethink.db('board-chatroom').tableCreate(table).run(connection)
+      await db('board-chatroom').tableCreate(table).run(connection)
     }
   }
 }
